@@ -1,6 +1,6 @@
 # kaggle-digits
 
-Working through the Theano [tutorial](http://deeplearning.net/software/theano/tutorial/index.html), using the [Kaggle Digits](https://www.kaggle.com/c/digit-recognizer/) competition as a benchmark.
+Working through the Theano [tutorial](http://deeplearning.net/tutorial/), using the [Kaggle Digits](https://www.kaggle.com/c/digit-recognizer/) competition as a benchmark.
 
 First submission:
 
