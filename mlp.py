@@ -33,13 +33,17 @@ def load():
 
 net = NeuralNet(
     layers=[  # three layers: one hidden layer
-        ('input', layers.InputLayer),
-        ('hidden', layers.DenseLayer),
-        ('output', layers.DenseLayer),
+            ('input', layers.InputLayer),
+            ('hidden1', layers.DenseLayer),
+            ('dropout1', layers.DropoutLayer),
+            ('hidden2', layers.DenseLayer),
+            ('dropout2', layers.DropoutLayer),
+            ('output', layers.DenseLayer),
         ],
     # layer parameters:
     input_shape=(None, 784),  # 28x28 input pixels per batch
-    hidden_num_units=500,  # number of units in hidden layer
+    hidden1_num_units=512,  # number of units in hidden layer
+    hidden2_num_units=512,
     output_nonlinearity=softmax,  # !
     output_num_units=10,  # 10 target values
 
@@ -48,7 +52,7 @@ net = NeuralNet(
     update_learning_rate=0.01,
     update_momentum=0.9,
 
-    max_epochs=3,  # we want to train this many epochs
+    max_epochs=10,  # we want to train this many epochs
     verbose=1,
     )
 
@@ -61,10 +65,17 @@ net.fit(X_train, y_train)
 #make predictions
 y_test = net.predict(X_test)
 
+ts = str(int(time.time()))
+
 #output predictions
-with open("mlp."+str(int(time.time())),"w") as f:
+with open("mlp.predictions."+ts,"w") as f:
     f.write("ImageId,Label\n")
     ImageId = 1
     for i in y_test:
         f.write( ",".join([str(ImageId),str(i)]) + '\n' )
         ImageId = ImageId + 1
+
+#pickle model
+import cPickle as pickle
+with open('mlp.pickle.'+ts, 'wb') as f:
+    pickle.dump(net, f, -1)
