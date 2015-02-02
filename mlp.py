@@ -1,9 +1,8 @@
-import os
-
+import time
 import numpy as np
 import pandas as pd
-from sklearn.utils import shuffle
 
+from sklearn.utils import shuffle
 from lasagne import layers
 from lasagne.updates import nesterov_momentum
 from lasagne.nonlinearities import softmax
@@ -12,37 +11,27 @@ from nolearn.lasagne import NeuralNet
 TEST_FILE = "data/test.csv"
 TRAIN_FILE = "data/train.csv"
 
-def load(test=False):
+def load():
 
-	def make_row(i):
-		row = np.zeros(10)
-		row.itemset(i,1)
-		return row
+	train = pd.read_csv(TRAIN_FILE)
+	test  = pd.read_csv(TEST_FILE)
 
-	fname = TEST_FILE if test else TRAIN_FILE
+	X = train.drop("label",1)
+	X = np.vstack(X.values) / 255.
+	X = X.astype(np.float32)
 
-	df = pd.read_csv(fname)
+	y_values = train["label"].values
+	y = y_values.astype(np.int32)
 
-	X=None
-	y=None
+	X_train, y_train = shuffle(X, y, random_state=42)  # shuffle train data
 
-	if not test:
-		X = df.drop("label",1)
-		X = np.vstack(X.values) / 255.
-		X = X.astype(np.float32)
+	X_test = np.vstack(test.values) / 255.
+	X_test = X_test.astype(np.float32)
 
-		y_values = df["label"].values
-		#y_rows = [make_row(i) for i in y_values]
-		#y = np.vstack(y_rows)
-		y = y_values.astype(np.int32)
+	return X_train,y_train,X_test
 
-		X, y = shuffle(X, y, random_state=42)  # shuffle train data
 
-		print X.shape,y.shape
-
-	return X,y
-
-net1 = NeuralNet(
+net = NeuralNet(
     layers=[  # three layers: one hidden layer
         ('input', layers.InputLayer),
         ('hidden', layers.DenseLayer),
@@ -59,11 +48,23 @@ net1 = NeuralNet(
     update_learning_rate=0.01,
     update_momentum=0.9,
 
-    max_epochs=300,  # we want to train this many epochs
+    max_epochs=3,  # we want to train this many epochs
     verbose=1,
     )
 
-X,y = load()
+#load data
+X_train,y_train,X_test = load()
 
-net1.fit(X, y)
+#train model
+net.fit(X_train, y_train)
 
+#make predictions
+y_test = net.predict(X_test)
+
+#output predictions
+with open("mlp."+str(int(time.time())),"w") as f:
+    f.write("ImageId,Label\n")
+    ImageId = 1
+    for i in y_test:
+        f.write( ",".join([str(ImageId),str(i)]) + '\n' )
+        ImageId = ImageId + 1
