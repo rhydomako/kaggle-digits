@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import pandas as pd
+import os
 
 from sklearn.utils import shuffle
 from lasagne import layers
@@ -17,6 +18,7 @@ else:  # Use faster (GPU-only) Conv2DCCLayer only if it's available
     Conv2DLayer = layers.cuda_convnet.Conv2DCCLayer
     MaxPool2DLayer = layers.cuda_convnet.MaxPool2DCCLayer
 
+sys.setrecursionlimit(10000)
 
 TEST_FILE = "data/test.csv"
 TRAIN_FILE = "data/train.csv"
@@ -48,21 +50,29 @@ net = NeuralNet(
         ('input', layers.InputLayer),
         ('conv1', Conv2DLayer),
         ('pool1', MaxPool2DLayer),
+	('dropout1', layers.DropoutLayer),
         ('conv2', Conv2DLayer),
         ('pool2', MaxPool2DLayer),
+	('dropout2', layers.DropoutLayer),
         ('conv3', Conv2DLayer),
         ('pool3', MaxPool2DLayer),
+	('dropout3', layers.DropoutLayer),
         ('hidden4', layers.DenseLayer),
+	('dropout4', layers.DropoutLayer),
         ('hidden5', layers.DenseLayer),
         ('output', layers.DenseLayer),
         ],
     # layer parameters:
     input_shape=(None, 1, 28, 28),  # 28x28 input pixels per batch
     conv1_num_filters=32, conv1_filter_size=(3, 3), pool1_ds=(2, 2),
+    dropout1_p=0.1,
     conv2_num_filters=64, conv2_filter_size=(2, 2), pool2_ds=(2, 2),
+    dropout2_p=0.2,
     conv3_num_filters=128, conv3_filter_size=(2, 2), pool3_ds=(2, 2),
-    hidden4_num_units=500, 
-    hidden5_num_units=500,
+    dropout3_p=0.3,
+    hidden4_num_units=1000,
+    dropout4_p=0.5,
+    hidden5_num_units=1000,
 
     output_nonlinearity=softmax,  # !
     output_num_units=10,  # 10 target values
@@ -72,7 +82,7 @@ net = NeuralNet(
     update_learning_rate=0.01,
     update_momentum=0.9,
 
-    max_epochs=40,  # we want to train this many epochs
+    max_epochs=400,  # we want to train this many epochs
     verbose=1,
     )
 
