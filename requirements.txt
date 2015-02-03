@@ -17,3 +17,4 @@ scipy==0.15.1
 seaborn==0.5.1
 six==1.9.0
 -e git+https://github.com/Theano/Theano.git@ba45997f3d252f1a0674d93b1f073ba136521de2#egg=Theano-dev
+-e git+https://github.com/lisa-lab/pylearn2.git@2f4537665c9f036c32c80b0c967b49ebb0b5f9ce#egg=pylearn2
