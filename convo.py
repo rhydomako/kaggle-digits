@@ -72,7 +72,7 @@ net = NeuralNet(
     update_learning_rate=0.01,
     update_momentum=0.9,
 
-    max_epochs=500,  # we want to train this many epochs
+    max_epochs=40,  # we want to train this many epochs
     verbose=1,
     )
 
